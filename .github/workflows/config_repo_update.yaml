@@ -1,0 +1,32 @@
+name: Update Config Repo with New Image Tag
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Config Repo
+        uses: actions/checkout@v2
+        with:
+          repository: AobaIwaki123/k8s_private  # Config Repoのリポジトリ名に置き換え
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: config-repo
+
+      - name: Update Kubernetes manifest with new image
+        run: |
+          sed -i 's|image: .*/k8s_sample_app:.*|image: ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.conclusion.outputs.RANDOM_TAG }}|' nginx/deployment.yaml
+
+      - name: Commit and Push changes to Config Repo
+        run: |
+          cd k8s_private
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add deployment.yaml
+          git commit -m "Update image tag to ${{ github.event.workflow_run.conclusion.outputs.RANDOM_TAG }}"
+          git push origin main
