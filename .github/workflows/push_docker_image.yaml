@@ -1,5 +1,5 @@
 #
-name: Create and publish a Docker image
+name: Build, Push Docker Image, and Update Config Repo
 
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
@@ -64,3 +64,23 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
       
+      # ここからConfig Repoを更新する処理
+      - name: Checkout Config Repo
+        uses: actions/checkout@v2
+        with:
+          repository: AobaIwaki123/k8s_sample_app  # Config Repoのリポジトリ名に置き換える
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: config-repo # config-repoというディレクトリが作成され、その中にAobaIwaki123/k8s_sample_appリポジトリの内容がクローンされる
+
+      - name: Update Kubernetes manifest with new image
+        run: |
+          sed -i 's|image: .*/k8s_sample_app:.*|image: ghcr.io/${{ env.IMAGE_NAME }}:${{ env.RANDOM_TAG }}|' config-repo/nginx/deployment.yaml
+
+      - name: Commit and Push changes to Config Repo
+        run: |
+          cd config-repo
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add ./nginx/deployment.yaml
+          git commit -m "Update image tag to ${{ env.RANDOM_TAG }}"
+          git push origin main
