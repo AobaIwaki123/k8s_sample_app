@@ -66,9 +66,9 @@ jobs:
       
       # ここからConfig Repoを更新する処理
       - name: Checkout Config Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
-          repository: AobaIwaki123/k8s_sample_app  # Config Repoのリポジトリ名に置き換える
+          repository: AobaIwaki123/k8s_private  # Config Repoのリポジトリ名に置き換える
           token: ${{ secrets.GITHUB_TOKEN }}
           path: config-repo # config-repoというディレクトリが作成され、その中にAobaIwaki123/k8s_sample_appリポジトリの内容がクローンされる
 
