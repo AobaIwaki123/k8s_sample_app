@@ -16,3 +16,4 @@ jobs:
         uses: ./.github/actions/release
         with:
           bump-level: ${{ env.bump-level }}
+          token: ${{ secrets.GITHUB_TOKEN }}

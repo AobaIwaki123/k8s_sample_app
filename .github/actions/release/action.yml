@@ -6,6 +6,10 @@ inputs:
     description: |
       バージョンを上げるレベルを指定します
     required: true
+  token:
+    description: |
+      GitHubのトークン
+    required: true
   username:
     description: |
       GitHubのユーザ名
@@ -26,7 +30,7 @@ runs:
         USERNAME: ${{ inputs.username }}
         EMAIL: ${{ inputs.email }}
         BUMP_LEVEL: ${{ inputs.bump-level }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.token }}
       run: |
         git config --global user.name "${USERNAME}"
         git config --global user.email "${EMAIL}"
