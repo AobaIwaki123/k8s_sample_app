@@ -1,0 +1,21 @@
+name: Update Minor Version
+on:
+  push:
+    branches:
+      - dev
+env:
+  bump-level: minor
+jobs:
+  update_minor_version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Minor Version
+        uses: ./.github/actions/release
+        with:
+          bump-level: ${{ env.bump-level }}
+          token: ${{ secrets.GITHUB_TOKEN }}
