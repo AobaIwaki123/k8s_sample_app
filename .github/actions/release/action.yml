@@ -6,17 +6,25 @@ inputs:
     description: |
       バージョンを上げるレベルを指定します
     required: true
-    default: patch
-    validation:
-      pattern: '^(major|minor|patch)$'
+  username:
+    description: |
+      GitHubのユーザ名
+    required: false
+    default: github-actions[bot]
+  email:
+    description: |
+      GitHubのメールアドレス
+    required: false
+    default: github-actions[bot]@users.noreply.github.com
 runs:
   using: composite
   steps:
     - uses: actions/checkout@v4
 
-    - env:
-        USERNAME: github-actions[bot]
-        EMAIL: github-actions[bot]@users.noreply.github.com
+    - name: Bump version and create release
+      env:
+        USERNAME: ${{ inputs.username }}
+        EMAIL: ${{ inputs.email }}
         BUMP_LEVEL: ${{ inputs.bump-level }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -24,3 +32,4 @@ runs:
         git config --global user.email "${EMAIL}"
         version="$(.github/scripts/bump.sh "${BUMP_LEVEL}")"
         gh release create "${version}" --title "${version}"--generate-notes
+      shell: bash
